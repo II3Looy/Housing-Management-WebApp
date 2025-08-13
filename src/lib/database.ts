@@ -76,10 +76,10 @@ export const storedProcedures = {
     executeStoredProcedure('dbo.UpdateBookingStatus', { BookingID, Active, Finished }),
 
   getEmployees: () => executeStoredProcedure('dbo.Employee_Read_All'),
-  createEmployee: (FirstName: string, LastName: string, NationalityID: number, PhoneNumber: string, Email: string, JobTitle: string, Salary: number) =>
-    executeStoredProcedure('dbo.Employee_Create', { FirstName, LastName, NationalityID, PhoneNumber, Email, JobTitle, Salary }),
-  updateEmployee: (EmployeeID: number, FirstName: string, LastName: string, NationalityID: number, PhoneNumber: string, Email: string, JobTitle: string, Salary: number) =>
-    executeStoredProcedure('dbo.Employee_Update', { EmployeeID, FirstName, LastName, NationalityID, PhoneNumber, Email, JobTitle, Salary }),
+  createEmployee: (FirstName: string, LastName: string, Email: string, PhoneNumber: number, JobTitle: string, NationalityID: number, Salary: number) =>
+    executeStoredProcedure('dbo.Employee_Create', { FirstName, LastName, Email, PhoneNumber, JobTitle, Nationality: NationalityID, Salary }),
+  updateEmployee: (EmployeeID: number, FirstName: string, LastName: string, NationalityID: number, PhoneNumber: number, Email: string, JobTitle: string, Salary: number) =>
+    executeStoredProcedure('dbo.Employee_Update', { EmployeeID, FirstName, LastName, Email, PhoneNumber, JobTitle, Nationality: NationalityID }),
   deleteEmployee: (EmployeeID: number) =>
     executeStoredProcedure('dbo.Employee_Delete', { EmployeeID }),
   getEmployeeById: (EmployeeID: number) =>

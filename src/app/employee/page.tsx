@@ -27,29 +27,40 @@ export default function EmployeePage() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editingEmployee, setEditingEmployee] = useState<any>(null);
     const [employees, setEmployees] = useState<any[]>([]);
+    const [nationalities, setNationalities] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Fetch employees from API
+    // Fetch employees and nationalities from API
     useEffect(() => {
-        const fetchEmployees = async () => {
+        const fetchData = async () => {
             try {
                 setLoading(true);
-                const response = await fetch('/api/employee');
-                if (!response.ok) {
+                
+                // Fetch employees
+                const employeesResponse = await fetch('/api/employee');
+                if (!employeesResponse.ok) {
                     throw new Error('Failed to fetch employees');
                 }
-                const data = await response.json();
-                setEmployees(data);
+                const employeesData = await employeesResponse.json();
+                setEmployees(employeesData);
+                
+                // Fetch nationalities
+                const nationalitiesResponse = await fetch('/api/nationality');
+                if (!nationalitiesResponse.ok) {
+                    throw new Error('Failed to fetch nationalities');
+                }
+                const nationalitiesData = await nationalitiesResponse.json();
+                setNationalities(nationalitiesData);
             } catch (err) {
-                console.error('Error fetching employees:', err);
-                setError(err instanceof Error ? err.message : 'Failed to fetch employees');
+                console.error('Error fetching data:', err);
+                setError(err instanceof Error ? err.message : 'Failed to fetch data');
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchEmployees();
+        fetchData();
     }, []);
 
     const handleSort = (columnKey: string) => {
@@ -154,6 +165,12 @@ export default function EmployeePage() {
         setEditingEmployee(null);
     };
 
+    // Helper function to get nationality name from ID
+    const getNationalityName = (nationalityId: number) => {
+        const nationality = nationalities.find(n => n.NationalityID === nationalityId);
+        return nationality ? nationality.Nationality : nationalityId;
+    };
+
     const sortedData = useMemo(() => {
         if (!sortColumn || !sortDirection) return employees;
         return [...employees].sort((a, b) => {
@@ -241,7 +258,7 @@ export default function EmployeePage() {
                                         <Table.Cell>{item.Email || ''}</Table.Cell>
                                         <Table.Cell>{item.PhoneNumber || ''}</Table.Cell>
                                         <Table.Cell>{item.JobTitle || ''}</Table.Cell>
-                                        <Table.Cell>{item.Nationality || ''}</Table.Cell>
+                                        <Table.Cell>{getNationalityName(item.Nationality) || ''}</Table.Cell>
                                         <Table.Cell>${(item.Salary || 0).toLocaleString()}</Table.Cell>
                                         <Table.Cell>{item.Discount || 0}</Table.Cell>
                                         <Table.Cell>${(item['Net Salary'] || 0).toLocaleString()}</Table.Cell>

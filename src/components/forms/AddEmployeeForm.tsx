@@ -25,7 +25,7 @@ const convertApiDataToFormData = (apiData: any): EmployeeFormData => {
     return {
         FirstName: apiData.FirstName || "",
         LastName: apiData.LastName || "",
-        NationalityID: apiData.NationalityID || 0,
+        NationalityID: apiData.Nationality || 0, // Use Nationality field which contains the ID
         PhoneNumber: apiData.PhoneNumber || "",
         Email: apiData.Email || "",
         JobTitle: apiData.JobTitle || "",
@@ -81,25 +81,25 @@ export function AddEmployeeForm({ onSubmit, onCancel, initialData, isEdit = fals
         // Validate form
         const newErrors: Partial<EmployeeFormData> = {};
         
-        if (!formData.FirstName.trim()) {
+        if (!String(formData.FirstName).trim()) {
             newErrors.FirstName = "Please enter first name";
         }
         
-        if (!formData.LastName.trim()) {
+        if (!String(formData.LastName).trim()) {
             newErrors.LastName = "Please enter last name";
         }
         
-        if (!formData.PhoneNumber.trim()) {
+        if (!String(formData.PhoneNumber).trim()) {
             newErrors.PhoneNumber = "Please enter phone number";
         }
         
-        if (!formData.Email.trim()) {
+        if (!String(formData.Email).trim()) {
             newErrors.Email = "Please enter email address";
-        } else if (!/\S+@\S+\.\S+/.test(formData.Email)) {
+        } else if (!/\S+@\S+\.\S+/.test(String(formData.Email))) {
             newErrors.Email = "Please enter a valid email address";
         }
         
-        if (!formData.JobTitle.trim()) {
+        if (!String(formData.JobTitle).trim()) {
             newErrors.JobTitle = "Please enter job title";
         }
         

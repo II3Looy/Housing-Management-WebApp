@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Use stored procedure to create employee
-        const result = await storedProcedures.createEmployee(FirstName, LastName, NationalityID, PhoneNumber, Email, JobTitle, Salary);
+        const result = await storedProcedures.createEmployee(FirstName, LastName, Email, parseInt(PhoneNumber), JobTitle, NationalityID, Salary);
         
         // Return the created employee
         const newEmployee = result.recordset?.[0] || {
@@ -71,7 +71,7 @@ export async function PUT(request: NextRequest) {
         }
 
         // Use stored procedure to update employee
-        const result = await storedProcedures.updateEmployee(EmployeeID, FirstName, LastName, NationalityID, PhoneNumber, Email, JobTitle, Salary);
+        const result = await storedProcedures.updateEmployee(EmployeeID, FirstName, LastName, NationalityID, parseInt(PhoneNumber), Email, JobTitle, Salary);
         
         // Return the updated employee
         const updatedEmployee = result.recordset?.[0] || {
