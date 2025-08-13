@@ -18,8 +18,8 @@ interface Booking {
 
 const columns = [
   { id: "BookingID", key: "BookingID", label: "Booking ID" },
-  { id: "RoomID", key: "RoomID", label: "Room ID" },
-  { id: "EmployeeID", key: "EmployeeID", label: "Employee ID" },
+  { id: "RoomID", key: "RoomID", label: "Room" },
+  { id: "EmployeeID", key: "EmployeeID", label: "Employee" },
   { id: "StartDate", key: "StartDate", label: "Start Date" },
   { id: "EndDate", key: "EndDate", label: "End Date" },
   { id: "Active", key: "Active", label: "Active" },
@@ -36,28 +36,49 @@ export default function BookingPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [employees, setEmployees] = useState<any[]>([]);
+  const [rooms, setRooms] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchBookings = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/booking');
-        if (!response.ok) {
+        const [bookingsResponse, employeesResponse, roomsResponse] = await Promise.all([
+          fetch('/api/booking'),
+          fetch('/api/employee'),
+          fetch('/api/room')
+        ]);
+
+        if (!bookingsResponse.ok) {
           throw new Error('Failed to fetch bookings');
         }
-        const data = await response.json();
-        setBookings(data);
+        if (!employeesResponse.ok) {
+          throw new Error('Failed to fetch employees');
+        }
+        if (!roomsResponse.ok) {
+          throw new Error('Failed to fetch rooms');
+        }
+
+        const [bookingsData, employeesData, roomsData] = await Promise.all([
+          bookingsResponse.json(),
+          employeesResponse.json(),
+          roomsResponse.json()
+        ]);
+
+        setBookings(bookingsData);
+        setEmployees(employeesData);
+        setRooms(roomsData);
       } catch (err) {
-        console.error('Error fetching bookings:', err);
-        setError(err instanceof Error ? err.message : 'Failed to fetch bookings');
+        console.error('Error fetching data:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch data');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchBookings();
+    fetchData();
   }, []);
 
   const handleSort = (columnKey: string) => {
@@ -165,6 +186,17 @@ export default function BookingPage() {
     });
   }, [sortColumn, sortDirection, bookings]);
 
+  // Helper functions to get employee and room names
+  const getEmployeeName = (employeeId: number) => {
+    const employee = employees.find(emp => emp.EmployeeID === employeeId);
+    return employee ? `${employee.FirstName} ${employee.LastName}` : `Employee ${employeeId}`;
+  };
+
+  const getRoomInfo = (roomId: number) => {
+    const room = rooms.find(r => r.RoomID === roomId);
+    return room ? `Room ${room.RoomNumber} (Building ${room.BuildingID})` : `Room ${roomId}`;
+  };
+
   return (
     <div className="min-h-screen">
       <Navigation />
@@ -233,8 +265,8 @@ export default function BookingPage() {
                   {sortedData.map((item, index) => (
                     <Table.Row key={item.BookingID || `booking-${index}`}>
                       <Table.Cell>{item.BookingID}</Table.Cell>
-                      <Table.Cell>{item.RoomID}</Table.Cell>
-                      <Table.Cell>{item.EmployeeID}</Table.Cell>
+                      <Table.Cell>{getRoomInfo(item.RoomID)}</Table.Cell>
+                      <Table.Cell>{getEmployeeName(item.EmployeeID)}</Table.Cell>
                       <Table.Cell>{item.StartDate ? new Date(item.StartDate).toLocaleDateString() : ''}</Table.Cell>
                       <Table.Cell>{item.EndDate ? new Date(item.EndDate).toLocaleDateString() : ''}</Table.Cell>
                       <Table.Cell>
