@@ -92,8 +92,8 @@ export const storedProcedures = {
   getRooms: () => executeStoredProcedure('dbo.Room_Read_All'),
   createRoom: (BuildingID: number, RoomNumber: number, RoomType: number, FloorNumber: number, Capacity: number, FreeBeds: number) =>
     executeStoredProcedure('dbo.Room_Create', { BuildingID, RoomNumber, RoomType, FloorNumber, Capacity, FreeBeds }),
-  updateRoom: (RoomID: number, BuildingID: number, RoomNumber: number, RoomType: number, FloorNumber: number, Capacity: number, FreeBeds: number, Availability: boolean) =>
-    executeStoredProcedure('dbo.Room_Update', { RoomID, BuildingID, RoomNumber, RoomType, FloorNumber, Capacity, FreeBeds, Availability }),
+  updateRoom: (RoomID: number, BuildingID: number, RoomNumber: number, RoomType: number, FloorNumber: number, Capacity: number, FreeBeds: number) =>
+    executeStoredProcedure('dbo.Room_Update', { RoomID, BuildingID, RoomNumber, RoomType, FloorNumber, Capacity, FreeBeds }),
   deleteRoom: (RoomID: number) =>
     executeStoredProcedure('dbo.Room_Delete', { RoomID }),
   getRoomById: (RoomID: number) =>

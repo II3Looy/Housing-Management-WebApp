@@ -230,8 +230,8 @@ export default function BookingPage() {
                   ))}
                 </Table.Header>
                 <Table.Body>
-                  {sortedData.map((item) => (
-                    <Table.Row key={item.BookingID}>
+                  {sortedData.map((item, index) => (
+                    <Table.Row key={item.BookingID || `booking-${index}`}>
                       <Table.Cell>{item.BookingID}</Table.Cell>
                       <Table.Cell>{item.RoomID}</Table.Cell>
                       <Table.Cell>{item.EmployeeID}</Table.Cell>
@@ -247,13 +247,43 @@ export default function BookingPage() {
                         </span>
                       </Table.Cell>
                       <Table.Cell>
-                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                          item.Finished 
-                            ? "bg-blue-900 text-blue-300" 
-                            : "bg-yellow-900 text-yellow-300"
-                        }`}>
-                          {item.Finished ? "Finished" : "Ongoing"}
-                        </span>
+                        {(() => {
+                          const now = new Date();
+                          const startDate = new Date(item.StartDate);
+                          const endDate = new Date(item.EndDate);
+                          
+                          if (item.Finished) {
+                            return (
+                              <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-blue-900 text-blue-300">
+                                Finished
+                              </span>
+                            );
+                          } else if (item.Active && now >= startDate && now <= endDate) {
+                            return (
+                              <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-green-900 text-green-300">
+                                Ongoing
+                              </span>
+                            );
+                          } else if (item.Active && now < startDate) {
+                            return (
+                              <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-yellow-900 text-yellow-300">
+                                Upcoming
+                              </span>
+                            );
+                          } else if (item.Active && now > endDate) {
+                            return (
+                              <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-orange-900 text-orange-300">
+                                Overdue
+                              </span>
+                            );
+                          } else {
+                            return (
+                              <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-gray-900 text-gray-300">
+                                Inactive
+                              </span>
+                            );
+                          }
+                        })()}
                       </Table.Cell>
                       <Table.Cell>
                         <div className="flex items-center gap-2">

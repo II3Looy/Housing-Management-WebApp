@@ -30,14 +30,18 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const result = await storedProcedures.createBooking(RoomID, EmployeeID, StartDate, EndDate);
+        // Convert dates to proper SQL Server format (YYYY-MM-DD)
+        const formattedStartDate = new Date(StartDate).toISOString().split('T')[0];
+        const formattedEndDate = new Date(EndDate).toISOString().split('T')[0];
+
+        const result = await storedProcedures.createBooking(RoomID, EmployeeID, formattedStartDate, formattedEndDate);
         
         // Return the created booking
         const newBooking = result.recordset?.[0] || {
             RoomID,
             EmployeeID,
-            StartDate,
-            EndDate,
+            StartDate: formattedStartDate,
+            EndDate: formattedEndDate,
             Active: true,
             Finished: false,
         };
@@ -66,10 +70,14 @@ export async function PUT(request: NextRequest) {
             );
         }
         
+        // Convert dates to proper SQL Server format (YYYY-MM-DD) if provided
+        const formattedStartDate = StartDate ? new Date(StartDate).toISOString().split('T')[0] : null;
+        const formattedEndDate = EndDate ? new Date(EndDate).toISOString().split('T')[0] : null;
+        
         // Use stored procedure to update booking
         let result;
         try {
-            result = await storedProcedures.updateBooking(BookingID, RoomID, EmployeeID, StartDate, EndDate);
+            result = await storedProcedures.updateBooking(BookingID, RoomID, EmployeeID, formattedStartDate || '', formattedEndDate || '');
         } catch (spError) {
             console.error('Stored procedure execution failed:', spError);
             throw new Error(`Stored procedure failed: ${spError instanceof Error ? spError.message : 'Unknown error'}`);
@@ -80,8 +88,8 @@ export async function PUT(request: NextRequest) {
             BookingID,
             RoomID,
             EmployeeID,
-            StartDate,
-            EndDate,
+            StartDate: formattedStartDate,
+            EndDate: formattedEndDate,
         };
 
         return NextResponse.json(updatedBooking);
